@@ -50,6 +50,11 @@ namespace LoanLib
             payment.Reminder = paymentAmount;
             return payment;
         }
+
+        public override string ToString()
+        {
+            return $"Invoice date: {this.InvoiceDate.ToString("yyyy-MM-dd")}, " + base.ToString() + $", Full Amount: {Math.Round(this.FullInvoiceAmount, 0, MidpointRounding.AwayFromZero)}";
+        }
     }
 
     public interface IPayable
@@ -67,7 +72,7 @@ namespace LoanLib
 
         public override string ToString()
         {
-            return base.ToString() + $", Reminder: {Math.Round(this.Reminder, 0, MidpointRounding.AwayFromZero)}";
+            return $"Pay date: {this.PayDate.ToString("yyyy-MM-dd")}, " + base.ToString() + $", Reminder: {Math.Round(this.Reminder, 0, MidpointRounding.AwayFromZero)}";
         }
 
         /// <summary>

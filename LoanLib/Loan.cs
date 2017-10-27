@@ -13,7 +13,7 @@ namespace LoanLib
         public int StartAmount { get; set; }
         public DateTime PayoutDate { get; set; }
         public double CurrentPrincipal { get; set; }
-        public double APR { get; set; }
+        public double InterestRate { get; set; }
         public int Tenure { get; set; }
         public List<Invoice> Invoices { get; set; }
 
@@ -34,7 +34,7 @@ namespace LoanLib
         }
         private void SetEmi()
         {
-            var r = this.APR / 12.0 / 100.0;
+            var r = this.InterestRate / 12.0 / 100.0;
             var n = this.Tenure * 12.0;
             var dividend = Math.Pow(1 + r, n);
             var divisor = dividend - 1;
@@ -43,7 +43,7 @@ namespace LoanLib
         public override Invoice AddInvoice(DateTime invoiceDate, double invoiceFee, IInterestCalculator interestCalculator)
         {
             var invoice = new Invoice();
-            invoice.Interest = interestCalculator.GetMonthlyInterest(this.APR, this.CurrentPrincipal);
+            invoice.Interest = interestCalculator.GetMonthlyInterest(this.InterestRate, this.CurrentPrincipal, DateTime.DaysInMonth(invoiceDate.Year, invoiceDate.Month));
             var leftForPrincipal = this.Emi - invoice.Interest;
             invoice.Principal = (leftForPrincipal <= this.CurrentPrincipal) ? leftForPrincipal : this.CurrentPrincipal;
             invoice.InvoiceDate = invoiceDate;
@@ -54,6 +54,7 @@ namespace LoanLib
         public override Payment Pay(DateTime payDate, double paymentAmount)
         {
             Payment aggregatedPayment = new Payment();
+            aggregatedPayment.PayDate = payDate;
             foreach (var invoice in this.Invoices.OrderBy(o => o.InvoiceDate))
             {
                 var payment = invoice.Pay(payDate, paymentAmount);
@@ -61,20 +62,50 @@ namespace LoanLib
                 aggregatedPayment += payment;
             }
             aggregatedPayment.Reminder = paymentAmount;
+            
+            // TODO: Here we can add things like overpayments.
             return aggregatedPayment;
         }
     }
 
     public interface IInterestCalculator
     {
-        double GetMonthlyInterest(double apr, double principal);
+        double GetMonthlyInterest(double rate, double principal, int days);
     }
 
     public class SimpleFlatInterest : IInterestCalculator
     {
-        public double GetMonthlyInterest(double apr, double principal)
+        public double GetMonthlyInterest(double rate, double principal, int days)
         {
-            return ((apr / 12.0d) / 100.0) * principal;
+            return ((rate / 12.0d) / 100.0) * principal;
+        }
+    }
+
+    public class Actual365 : IInterestCalculator
+    {
+        public double GetMonthlyInterest(double rate, double principal, int days)
+        {
+            var dailyRate = rate / 100.0 / 365; // Not acctually true, should be 366 on leap years.
+            return dailyRate * days * principal;
+        }
+    }
+
+    public class Actual360 : IInterestCalculator
+    {
+        public double GetMonthlyInterest(double rate, double principal, int days)
+        {
+            var dailyRate = rate / 100.0 / 360; // Not acctually true, should be 366 on leap years.
+            return dailyRate * days * principal;
+        }
+    }
+
+    public class Rate30360 : IInterestCalculator
+    {
+        public double GetMonthlyInterest(double rate, double principal, int days)
+        {
+            days = 30;
+            var dailyRate = rate / 100.0 / 360; // Not acctually true, should be 366 on leap years.
+            return dailyRate * days * principal;
         }
     }
 
