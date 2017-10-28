@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoanLib", "LoanLib\LoanLib.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestConsoleApp", "TestConsoleApp\TestConsoleApp.csproj", "{21468AA4-86AE-4D06-A576-4142DCDFD3B5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoanLibTests", "LoanLibTests\LoanLibTests.csproj", "{08ED100C-CCD6-4368-BC7F-B254A7ED707E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{21468AA4-86AE-4D06-A576-4142DCDFD3B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{21468AA4-86AE-4D06-A576-4142DCDFD3B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{21468AA4-86AE-4D06-A576-4142DCDFD3B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08ED100C-CCD6-4368-BC7F-B254A7ED707E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08ED100C-CCD6-4368-BC7F-B254A7ED707E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08ED100C-CCD6-4368-BC7F-B254A7ED707E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08ED100C-CCD6-4368-BC7F-B254A7ED707E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

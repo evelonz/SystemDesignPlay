@@ -15,7 +15,7 @@ namespace LoanLib
 
         public override string ToString()
         {
-            return $"Principal: {Math.Round(this.Principal, 0, MidpointRounding.AwayFromZero)}, Interest: {Math.Round(this.Interest, 0, MidpointRounding.AwayFromZero)}, InvoiceFee: {Math.Round(this.InvoiceFee, 0, MidpointRounding.AwayFromZero)}, LateFee: {Math.Round(this.LateFee, 0, MidpointRounding.AwayFromZero)}";
+            return $"Principal: {Math.Round(this.Principal, 2, MidpointRounding.AwayFromZero)}, Interest: {Math.Round(this.Interest, 2, MidpointRounding.AwayFromZero)}, InvoiceFee: {Math.Round(this.InvoiceFee, 2, MidpointRounding.AwayFromZero)}, LateFee: {Math.Round(this.LateFee, 2, MidpointRounding.AwayFromZero)}";
         }
     }
 
@@ -53,7 +53,7 @@ namespace LoanLib
 
         public override string ToString()
         {
-            return $"Invoice date: {this.InvoiceDate.ToString("yyyy-MM-dd")}, " + base.ToString() + $", Full Amount: {Math.Round(this.FullInvoiceAmount, 0, MidpointRounding.AwayFromZero)}";
+            return $"Invoice date: {this.InvoiceDate.ToString("yyyy-MM-dd")}, " + base.ToString() + $", Full Amount: {Math.Round(this.FullInvoiceAmount, 2, MidpointRounding.AwayFromZero)}";
         }
     }
 
@@ -72,7 +72,7 @@ namespace LoanLib
 
         public override string ToString()
         {
-            return $"Pay date: {this.PayDate.ToString("yyyy-MM-dd")}, " + base.ToString() + $", Reminder: {Math.Round(this.Reminder, 0, MidpointRounding.AwayFromZero)}";
+            return $"Pay date: {this.PayDate.ToString("yyyy-MM-dd")}, " + base.ToString() + $", Reminder: {Math.Round(this.Reminder, 2, MidpointRounding.AwayFromZero)}";
         }
 
         /// <summary>
