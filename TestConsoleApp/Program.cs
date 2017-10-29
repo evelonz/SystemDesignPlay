@@ -12,15 +12,13 @@ namespace TestConsoleApp
         static void Main(string[] args)
         {
             
-            TestPayingOnLoan(new SimpleFlatInterest());
-            TestPayingOnLoan(new Actual365());
-            TestPayingOnLoan(new Actual360());
-            TestPayingOnLoan(new Rate30360());
-            TestCreatingInvoices(new SimpleFlatInterest());
-            TestCreatingInvoices(new Actual365());
-            TestCreatingInvoices(new Actual360());
+            //TestPayingOnLoan(new RateActual365());
+            //TestPayingOnLoan(new RateActual360());
+            //TestPayingOnLoan(new Rate30360());
+            //TestCreatingInvoices(new RateActual365());
+            //TestCreatingInvoices(new RateActual360());
             TestCreatingInvoices(new Rate30360());
-
+            TestCreatingInvoices();
         }
 
         static void TestPayingOnLoan(IInterestCalculator rateCalculator)
@@ -74,6 +72,35 @@ namespace TestConsoleApp
                 baseDate = baseDate.AddMonths(1);
                 var date = baseDate.AddDays(-1);
                 var invoice = loan.AddInvoice(date, 0.0, rateCalculator);
+                loan.CurrentPrincipal -= invoice.Principal;
+                invoices.Add(invoice);
+
+                Console.WriteLine(invoice.ToString());
+                //Console.WriteLine($"{invoice.InvoiceDate.ToString("MMM-yyyy")} | {Math.Round(invoice.FullInvoiceAmount, 0, MidpointRounding.AwayFromZero)} | {Math.Round(invoice.Interest, 0, MidpointRounding.AwayFromZero)} | {Math.Round(invoice.Principal, 0, MidpointRounding.AwayFromZero)} | {Math.Round(loan.CurrentPrincipal, 0, MidpointRounding.AwayFromZero)}");
+            }
+            Console.WriteLine($"SUM: Principal {invoices.Sum(s => s.Principal)}, Interest: {invoices.Sum(s => s.Interest)}, InvoiceFee: {invoices.Sum(s => s.InvoiceFee)}, LateFee: {invoices.Sum(s => s.LateFee)}");
+        }
+
+        static void TestCreatingInvoices()
+        {
+            var loan = new NewCool30360Loan()
+            {
+                InterestRate = 10,
+                CurrentPrincipal = 10000,
+                StartAmount = 10000,
+                //PayoutDate = new DateTime(2017, 10, 01),
+                Tenure = 10,
+            };
+
+            var dayCalculator = new Thirty360Psa();
+
+            var invoices = new List<Invoice>();
+            var baseDate = new DateTime(2017, 10, 01);
+            while (loan.CurrentPrincipal > 0.0)
+            {
+                baseDate = baseDate.AddMonths(1);
+                var date = baseDate.AddDays(-1);
+                var invoice = loan.AddInvoice(date, new DateTime(date.Year, date.Month, 1), baseDate, 0.0, dayCalculator);
                 loan.CurrentPrincipal -= invoice.Principal;
                 invoices.Add(invoice);
 

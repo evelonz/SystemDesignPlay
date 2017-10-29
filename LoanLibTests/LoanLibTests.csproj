@@ -57,6 +57,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="FixedRateFixedEmiLoanTests.cs" />
+    <Compile Include="InterestHelperTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

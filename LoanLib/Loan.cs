@@ -68,45 +68,6 @@ namespace LoanLib
         }
     }
 
-    public interface IInterestCalculator
-    {
-        double GetMonthlyInterest(double rate, double principal, int days);
-    }
-
-    public class SimpleFlatInterest : IInterestCalculator
-    {
-        public double GetMonthlyInterest(double rate, double principal, int days)
-        {
-            return ((rate / 12.0d) / 100.0) * principal;
-        }
-    }
-
-    public class Actual365 : IInterestCalculator
-    {
-        public double GetMonthlyInterest(double rate, double principal, int days)
-        {
-            var dailyRate = rate / 100.0 / 365; // Not acctually true, should be 366 on leap years.
-            return dailyRate * days * principal;
-        }
-    }
-
-    public class Actual360 : IInterestCalculator
-    {
-        public double GetMonthlyInterest(double rate, double principal, int days)
-        {
-            var dailyRate = rate / 100.0 / 360; // Not acctually true, should be 366 on leap years.
-            return dailyRate * days * principal;
-        }
-    }
-
-    public class Rate30360 : IInterestCalculator
-    {
-        public double GetMonthlyInterest(double rate, double principal, int days)
-        {
-            days = 30;
-            var dailyRate = rate / 100.0 / 360; // Not acctually true, should be 366 on leap years.
-            return dailyRate * days * principal;
-        }
-    }
+    
 
 }
