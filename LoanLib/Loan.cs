@@ -17,7 +17,7 @@ namespace LoanLib
         public int Tenure { get; set; }
         public List<Invoice> Invoices { get; set; }
 
-        public abstract Invoice AddInvoice(DateTime invoiceDate, double invoiceFee, IInterestCalculator interestCalculator);
+        public abstract Invoice AddInvoice(DateTime invoiceDate, DateTime invoiceStartDate, DateTime invoiceEndDate, double invoiceFee, IDayCounter dayCounter);
 
         public abstract Payment Pay(DateTime payDate, double paymentAmount);
     }
@@ -40,10 +40,14 @@ namespace LoanLib
             var divisor = dividend - 1;
             this._emi = this.StartAmount * r * (dividend / divisor);
         }
-        public override Invoice AddInvoice(DateTime invoiceDate, double invoiceFee, IInterestCalculator interestCalculator)
+        public override Invoice AddInvoice(DateTime invoiceDate, DateTime invoiceStartDate, DateTime invoiceEndDate, double invoiceFee, IDayCounter dayCounter)
         {
             var invoice = new Invoice();
-            invoice.Interest = interestCalculator.GetMonthlyInterest(this.InterestRate, this.CurrentPrincipal, DateTime.DaysInMonth(invoiceDate.Year, invoiceDate.Month));
+            // Rate. Could probaply extract this some more.
+            var yearFraction = dayCounter.GetYearFraction(invoiceStartDate, invoiceEndDate);
+            var fractionRate = yearFraction * this.InterestRate / 100.0d;
+            invoice.Interest = fractionRate * this.CurrentPrincipal;
+
             var leftForPrincipal = this.Emi - invoice.Interest;
             invoice.Principal = (leftForPrincipal <= this.CurrentPrincipal) ? leftForPrincipal : this.CurrentPrincipal;
             invoice.InvoiceDate = invoiceDate;
@@ -67,7 +71,5 @@ namespace LoanLib
             return aggregatedPayment;
         }
     }
-
-    
 
 }

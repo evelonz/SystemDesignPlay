@@ -21,7 +21,7 @@ namespace LoanLib
 
     public interface IInvoicable
     {
-        Invoice AddInvoice(DateTime invoiceDate, double invoiceFee, IInterestCalculator interestCalculator);
+        Invoice AddInvoice(DateTime invoiceDate, DateTime invoiceStartDate, DateTime invoiceEndDate, double invoiceFee, IDayCounter dayCounter);
     }
 
     public class Invoice : BaseInvoiceProperties, IPayable

@@ -24,14 +24,14 @@ namespace LoanLib.Tests
             };
 
             Invoice invoice = new Invoice();
-            var rateCalculator = new Rate30360();
+            var dayCalculator = new Thirty360Isda();
             var invoices = new List<Invoice>();
             var baseDate = loan.PayoutDate;
             while (loan.CurrentPrincipal > 0.0)
             {
                 baseDate = baseDate.AddMonths(1);
                 var date = baseDate.AddDays(-1);
-                invoice = loan.AddInvoice(date, 0.0, rateCalculator);
+                invoice = loan.AddInvoice(date, new DateTime(date.Year, date.Month, 1), baseDate, 0.0, dayCalculator);
                 loan.CurrentPrincipal -= invoice.Principal; // Fake payments on the loan.
                 invoices.Add(invoice);
             }
