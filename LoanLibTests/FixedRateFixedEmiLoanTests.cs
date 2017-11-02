@@ -14,7 +14,7 @@ namespace LoanLib.Tests
         [TestMethod()]
         public void AddInvoiceTest()
         {
-            var loan = new FixedRateFixedEmiLoan()
+            var loan = new FixedEmiLoan()
             {
                 InterestRate = 10,
                 CurrentPrincipal = 10000,

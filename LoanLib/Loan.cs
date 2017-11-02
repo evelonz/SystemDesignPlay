@@ -22,7 +22,7 @@ namespace LoanLib
         public abstract Payment Pay(DateTime payDate, double paymentAmount);
     }
 
-    public class FixedRateFixedEmiLoan : Loan
+    public class FixedEmiLoan : Loan
     {
         private double _emi { get; set; }
         public double Emi { get
@@ -72,4 +72,45 @@ namespace LoanLib
         }
     }
 
+
+    public class FixedAmortizationLoan: Loan
+    {
+        public FixedAmortizationLoan(double amortization) : base()
+        {
+            _amortization = amortization;
+        }
+        private double _amortization { get; set; }
+        public double Amortization { get { return _amortization; } }
+        
+        public override Invoice AddInvoice(DateTime invoiceDate, DateTime invoiceStartDate, DateTime invoiceEndDate, double invoiceFee, IDayCounter dayCounter)
+        {
+            var invoice = new Invoice();
+            // Rate. Could probaply extract this some more.
+            var yearFraction = dayCounter.GetYearFraction(invoiceStartDate, invoiceEndDate);
+            var fractionRate = yearFraction * this.InterestRate / 100.0d;
+            invoice.Interest = fractionRate * this.CurrentPrincipal;
+
+            var leftForPrincipal = this.Amortization;
+            invoice.Principal = (leftForPrincipal <= this.CurrentPrincipal) ? leftForPrincipal : this.CurrentPrincipal;
+            invoice.InvoiceDate = invoiceDate;
+            invoice.InvoiceFee = invoiceFee;
+            return invoice;
+        }
+
+        public override Payment Pay(DateTime payDate, double paymentAmount)
+        {
+            Payment aggregatedPayment = new Payment();
+            aggregatedPayment.PayDate = payDate;
+            foreach (var invoice in this.Invoices.OrderBy(o => o.InvoiceDate))
+            {
+                var payment = invoice.Pay(payDate, paymentAmount);
+                paymentAmount = payment.Reminder;
+                aggregatedPayment += payment;
+            }
+            aggregatedPayment.Reminder = paymentAmount;
+
+            // TODO: Here we can add things like overpayments.
+            return aggregatedPayment;
+        }
+    }
 }
