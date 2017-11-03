@@ -129,7 +129,7 @@ namespace LoanLib
         }
         private void SetMonthlyPrincipal()
         {
-            this._monthlyPrincipal = this.StartAmount / (TenureYears * 12);
+            this._monthlyPrincipal = this.StartAmount / (double)(TenureYears * 12);
         }
         public override Invoice AddInvoice(DateTime invoiceDate, DateTime invoiceStartDate, DateTime invoiceEndDate, double invoiceFee, IDayCounter dayCounter)
         {
