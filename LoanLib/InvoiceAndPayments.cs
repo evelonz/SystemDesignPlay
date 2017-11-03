@@ -76,7 +76,7 @@ namespace LoanLib
         }
 
         /// <summary>
-        /// Add two payments, but not their remainging amount.
+        /// Add all values of two payments, but takes the paydate of the first payment.
         /// </summary>
         public static Payment operator +(Payment a, Payment b)
         {
@@ -85,7 +85,10 @@ namespace LoanLib
             payment.Interest = a.Interest + b.Interest;
             payment.InvoiceFee = a.InvoiceFee + b.InvoiceFee;
             payment.LateFee = a.LateFee + b.LateFee;
+            payment.Reminder = a.Reminder + b.Reminder;
+            payment.PayDate = a.PayDate;
             return payment;
         }
+
     }
 }

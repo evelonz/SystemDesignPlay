@@ -20,7 +20,7 @@ namespace LoanLib.Tests
                 CurrentPrincipal = 10000,
                 StartAmount = 10000,
                 PayoutDate = new DateTime(2017, 10, 01),
-                Tenure = 10,
+                TenureYears = 10,
             };
 
             Invoice invoice = new Invoice();
