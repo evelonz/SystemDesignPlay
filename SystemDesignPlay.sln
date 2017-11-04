@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestConsoleApp", "TestConso
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoanLibTests", "LoanLibTests\LoanLibTests.csproj", "{08ED100C-CCD6-4368-BC7F-B254A7ED707E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestCoreWebApp", "TestCoreWebApp\TestCoreWebApp.csproj", "{F009BA36-A440-43D0-889D-E354E4864BB4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{08ED100C-CCD6-4368-BC7F-B254A7ED707E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{08ED100C-CCD6-4368-BC7F-B254A7ED707E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{08ED100C-CCD6-4368-BC7F-B254A7ED707E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F009BA36-A440-43D0-889D-E354E4864BB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F009BA36-A440-43D0-889D-E354E4864BB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F009BA36-A440-43D0-889D-E354E4864BB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F009BA36-A440-43D0-889D-E354E4864BB4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

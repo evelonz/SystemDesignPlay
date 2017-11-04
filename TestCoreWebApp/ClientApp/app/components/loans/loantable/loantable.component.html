@@ -1,0 +1,25 @@
+<h1>Loan table</h1>
+
+<p>Display payment plan for a given loan.</p>
+<loanform></loanform>
+
+<p *ngIf="!loanpayments"><em>Loading...</em></p>
+
+<table class='table' *ngIf="loanpayments">
+    <thead>
+        <tr>
+            <th>Period</th>
+            <th>Princiapl</th>
+            <th>Interest</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let loanpayment of loanpayments">
+            <td>{{ loanpayment.periodFormatted }}</td>
+            <td>{{ loanpayment.principal }}</td>
+            <td>{{ loanpayment.interest }}</td>
+            <td>{{ loanpayment.total }}</td>
+        </tr>
+    </tbody>
+</table>

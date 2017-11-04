@@ -1,0 +1,15 @@
+<label>Tenure (years): </label>
+<input type="number" [(ngModel)]=tenure id="tenure">
+<br />
+<label>Interest: </label>
+<input type="number" [(ngModel)]=interest id="interest">
+<br />
+<label>Loan amount: </label>
+<input type="number" [(ngModel)]=principal id="principal">
+<br />
+<label>Payout date: </label>
+<input type="date" [(ngModel)]=payoutDate id="payoutDate">
+<br />
+<div>
+    <button (click)="onClickMe()">Load loan</button>
+</div>
