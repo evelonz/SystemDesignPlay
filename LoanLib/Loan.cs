@@ -75,13 +75,23 @@ namespace LoanLib
 
     public class FixedAmortizationLoan: Loan
     {
-        public FixedAmortizationLoan(double amortization) : base()
+        public FixedAmortizationLoan() : base()
         {
-            _amortization = amortization;
         }
-        private double _amortization { get; set; }
-        public double Amortization { get { return _amortization; } }
-        
+        private double _monthlyPrincipal { get; set; }
+        public double MontlyPrincipal
+        {
+            get
+            {
+                if (_monthlyPrincipal == 0.0 && this.CurrentPrincipal > 0.0)
+                { SetMonthlyPrincipal(); }
+                return _monthlyPrincipal;
+            }
+        }
+        private void SetMonthlyPrincipal()
+        {
+            this._monthlyPrincipal = this.StartAmount / (double)(TenureYears * 12);
+        }
         public override Invoice AddInvoice(DateTime invoiceDate, DateTime invoiceStartDate, DateTime invoiceEndDate, double invoiceFee, IDayCounter dayCounter)
         {
             var invoice = new Invoice();
@@ -90,7 +100,7 @@ namespace LoanLib
             var fractionRate = yearFraction * this.InterestRate / 100.0d;
             invoice.Interest = fractionRate * this.CurrentPrincipal;
 
-            var leftForPrincipal = this.Amortization;
+            var leftForPrincipal = this.MontlyPrincipal;
             invoice.Principal = (leftForPrincipal <= this.CurrentPrincipal) ? leftForPrincipal : this.CurrentPrincipal;
             invoice.InvoiceDate = invoiceDate;
             invoice.InvoiceFee = invoiceFee;

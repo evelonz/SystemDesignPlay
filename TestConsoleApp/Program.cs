@@ -87,7 +87,7 @@ namespace TestConsoleApp
 
         static void TestCreatingInvoices2(IDayCounter dayCalculator, string filename)
         {
-            var loan = new FixedAmortizationLoan(70)
+            var loan = new FixedAmortizationLoan()
             {
                 InterestRate = 10,
                 CurrentPrincipal = 10000,
