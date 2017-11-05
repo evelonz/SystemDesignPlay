@@ -15,13 +15,18 @@ export class LoanService {
         this.http = http;
     }
 
-    updateLoanPaymentPlan(tenure: number, principal: number, interest: number, payoutDate: string) {
+    updateLoanPaymentPlan(tenure: number, principal: number, interest: number, payoutDate: Date) {
+        let date = [
+            payoutDate.getFullYear(),
+            ('0' + (payoutDate.getMonth() + 1)).slice(-2),
+            ('0' + payoutDate.getDate()).slice(-2)
+        ].join('-');
         var queryString = this.baseUrl + 'api/Loan/Loan?' +
             'loanType=FixedEmiLoan' + //loanType +
             '&tenure=' + tenure +
             '&interestRate=' + interest +
             '&principal=' + principal +
-            '&payoutDate=' + payoutDate;
+            '&payoutDate=' + date;
         this.http.get(queryString).subscribe(result => {
             //console.error(result.json());
             var p = result.json() as LoanPayment[];

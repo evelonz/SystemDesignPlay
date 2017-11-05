@@ -1,15 +1,32 @@
-<label>Tenure (years): </label>
-<input type="number" [(ngModel)]=tenure id="tenure">
-<br />
-<label>Interest: </label>
-<input type="number" [(ngModel)]=interest id="interest">
-<br />
-<label>Loan amount: </label>
-<input type="number" [(ngModel)]=principal id="principal">
-<br />
-<label>Payout date: </label>
-<input type="date" [(ngModel)]=payoutDate id="payoutDate">
-<br />
-<div>
-    <button (click)="onClickMe()">Load loan</button>
-</div>
+
+<form class="example-form" (ngSubmit)="onSubmit()">
+    <mat-slider step="1" tickInterval="1" thumbLabel min="1" max="10" [(ngModel)]=formdata.tenure name="tenure">
+        <input type="range">
+    </mat-slider>
+    <mat-form-field style="width:20px;">
+        <input matInput [(ngModel)]=formdata.tenure name="tenure2" disabled="disabled"> 
+    </mat-form-field>
+    <br />
+    <mat-slider step="1" tickInterval="1" thumbLabel min="1" max="15" [(ngModel)]=formdata.interest name="interest">
+        <input type="range">
+    </mat-slider>
+    <mat-form-field style="width:20px;">
+        <input matInput [(ngModel)]=formdata.interest name="interest2" disabled="disabled">
+    </mat-form-field>
+    <br />
+    <mat-slider step="1000" thumbLabel min="5000" max="50000" [(ngModel)]=formdata.principal name="principal">
+        <input type="range">
+    </mat-slider>
+    <mat-form-field style="width:40px;">
+        <input matInput [(ngModel)]=formdata.principal name="principal2" disabled="disabled">
+    </mat-form-field>
+    <br />
+    <mat-form-field>
+        <input matInput [(ngModel)]=formdata.payoutDate name="payoutDate" [matDatepicker]="picker" placeholder="Choose a date">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+    <br />
+    <button mat-button type="submit">Calculate loan</button>
+</form>
+
