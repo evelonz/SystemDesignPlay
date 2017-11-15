@@ -16,6 +16,13 @@ namespace LoanLib
         public double InterestRate { get; set; }
         public int TenureYears { get; set; }
         public List<Invoice> Invoices { get; set; }
+        public List<Payment> Payments { get; set; }
+
+        public Loan()
+        {
+            Invoices = new List<Invoice>();
+            Payments = new List<Payment>();
+        }
 
         public virtual Invoice AddInvoice(DateTime invoiceDate, DateTime invoiceStartDate, DateTime invoiceEndDate, double invoiceFee, IDayCounter dayCounter)
         {
@@ -30,6 +37,7 @@ namespace LoanLib
             invoice.Principal = Math.Round(invoice.Principal, 2, MidpointRounding.AwayFromZero);
             invoice.InvoiceDate = invoiceDate;
             invoice.InvoiceFee = invoiceFee;
+            Invoices.Add(invoice);
             return invoice;
         }
 
@@ -45,10 +53,12 @@ namespace LoanLib
                 var payment = invoice.Pay(payDate, paymentAmount);
                 paymentAmount = payment.Reminder;
                 aggregatedPayment += payment;
+                this.CurrentPrincipal -= payment.Principal;
             }
             aggregatedPayment.Reminder = paymentAmount;
 
             // TODO: Here we can add things like overpayments.
+            Payments.Add(aggregatedPayment);
             return aggregatedPayment;
         }
     }

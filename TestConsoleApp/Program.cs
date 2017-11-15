@@ -16,12 +16,42 @@ namespace TestConsoleApp
 
             //TestPayingOnLoan(new Actual365F());
             TestPayingOnLoan(new Thirty360Psa());
+            TestLoanEvents(new Thirty360Psa(), "");
             //TestPayingOnLoan(new Thirty360Isda());
             //TestCreatingInvoices(new Actual365F(), "Actual365F");
             //TestCreatingInvoices(new Thirty360Psa(), "Thirty360Psa");
             //TestCreatingInvoices(new Thirty360Isda(), "Thirty360Isda");
             TestCreatingInvoices2(new Thirty360Isda(), "FlatAThirty360Isda");
             TestCreatingInvoices3(new Thirty360Isda(), "FlatInterstThirty360Isda");
+        }
+
+        static void TestLoanEvents(IDayCounter dayCalculator, string filename)
+        {
+            var loan = new FixedEmiLoan()
+            {
+                InterestRate = 10,
+                CurrentPrincipal = 10000,
+                StartAmount = 10000,
+                PayoutDate = new DateTime(2017, 10, 01),
+                TenureYears = 10,
+            };
+
+            var invoiceDate = new DateTime(2017, 01, 01);
+            var events = new List<LoanEvent>()
+            {
+                new LoanEvent() { Type = LoanEvent.EventTypes.Invoice, Amount = 0.0d, EventTime = invoiceDate },
+                new LoanEvent() { Type = LoanEvent.EventTypes.Invoice, Amount = 0.0d, EventTime = invoiceDate.AddMonths(1) },
+                new LoanEvent() { Type = LoanEvent.EventTypes.Invoice, Amount = 0.0d, EventTime = invoiceDate.AddMonths(2) },
+                new LoanEvent() { Type = LoanEvent.EventTypes.Payment, Amount = 5000.0d, EventTime = new DateTime(2017, 03, 31)}
+            };
+
+            LoanEventRunner.RunEvents(loan, events, dayCalculator);
+
+            var invoices = loan.Invoices;
+            Console.WriteLine($"SUM: Principal {invoices.Sum(s => s.Principal)}, Interest: {invoices.Sum(s => s.Interest)}, InvoiceFee: {invoices.Sum(s => s.InvoiceFee)}, LateFee: {invoices.Sum(s => s.LateFee)}");
+            Console.WriteLine("Current Principal: " + loan.CurrentPrincipal);
+
+            //TestOutput.CreateCSV(loan.Invoices, filename);
         }
 
         static void TestPayingOnLoan(IDayCounter dayCalculator)
@@ -42,7 +72,7 @@ namespace TestConsoleApp
                 baseDate = baseDate.AddMonths(1);
                 var date = baseDate.AddDays(-1);
                 var invoice = loan.AddInvoice(date, new DateTime(date.Year, date.Month, 1), baseDate, 0.0, dayCalculator);
-                loan.CurrentPrincipal -= invoice.Principal;
+                //loan.CurrentPrincipal -= invoice.Principal;
                 invoices.Add(invoice);
 
                 //Console.WriteLine(invoice.ToString());
@@ -113,7 +143,6 @@ namespace TestConsoleApp
             TestOutput.CreateCSV(invoices, filename);
         }
 
-
         static void TestCreatingInvoices3(IDayCounter dayCalculator, string filename)
         {
             var loan = new FixedInterestLoan()
@@ -142,5 +171,52 @@ namespace TestConsoleApp
             TestOutput.CreateCSV(invoices, filename);
         }
 
+    }
+
+    class LoanEventRunner
+    {
+        public static void RunEvents(Loan loan, List<LoanEvent> events, IDayCounter dayCalculator)
+        {
+            foreach (var loanEvent in events.OrderBy(o => o.EventTime))
+            {
+                switch (loanEvent.Type)
+                {
+                    case LoanEvent.EventTypes.Invoice:
+                        InvoiceEvent(loan, loanEvent, dayCalculator);
+                        break;
+                    case LoanEvent.EventTypes.Payment:
+                        PayEvent(loan, loanEvent);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        private static void InvoiceEvent(Loan loan, LoanEvent loanEvent, IDayCounter dayCalculator)
+        {
+            var firstDayOfMonth = new DateTime(loanEvent.EventTime.Year, loanEvent.EventTime.Month, 1);
+            var firstDayOfNextMonth = firstDayOfMonth.AddMonths(1);
+            loan.AddInvoice(loanEvent.EventTime, firstDayOfMonth, firstDayOfNextMonth, loanEvent.Amount, dayCalculator);
+        }
+
+        private static void PayEvent(Loan loan, LoanEvent loanEvent)
+        {
+            var payment = loan.Pay(loanEvent.EventTime, loanEvent.Amount);
+            Console.WriteLine(payment.ToString());
+        }
+    }
+
+    class LoanEvent
+    {
+        public EventTypes Type { get; set; }
+        public DateTime EventTime { get; set; }
+        public double Amount { get; set; }
+
+        public enum EventTypes: int
+        {
+            Invoice = 1,
+            Payment = 2
+        }
     }
 }
