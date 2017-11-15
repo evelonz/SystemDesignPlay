@@ -10,8 +10,10 @@ import { HomeComponent } from './components/home/home.component';
 import { FetchDataComponent } from './components/fetchdata/fetchdata.component';
 import { CounterComponent } from './components/counter/counter.component';
 import { LoanDataComponent } from './components/loans/loantable/loantable.component';
+import { MaterialLoanDataComponent } from './components/loans/loantable/materialloantable.component';
 import { LoanService } from './components/loans/services/loan.service';
 import { LoanFormComponent } from './components/loans/loanforms/loanform.component';
+import { LoanCalculatorComponent } from './components/loans/loancalculator.component';
 
 import {
     MatAutocompleteModule,
@@ -67,6 +69,8 @@ import { CdkTableModule         } from '@angular/cdk/table';
         HomeComponent,
         LoanDataComponent,
         LoanFormComponent,
+        LoanCalculatorComponent,
+        MaterialLoanDataComponent,
     ],
     imports: [
         CommonModule,
@@ -77,7 +81,7 @@ import { CdkTableModule         } from '@angular/cdk/table';
             { path: 'home', component: HomeComponent },
             { path: 'counter', component: CounterComponent },
             { path: 'fetch-data', component: FetchDataComponent },
-            { path: 'loan-table', component: LoanDataComponent },
+            { path: 'loan-calculator', component: LoanCalculatorComponent },
             { path: '**', redirectTo: 'home' }
         ]),
         BrowserAnimationsModule,

@@ -17,9 +17,40 @@ namespace LoanLib
         public int TenureYears { get; set; }
         public List<Invoice> Invoices { get; set; }
 
-        public abstract Invoice AddInvoice(DateTime invoiceDate, DateTime invoiceStartDate, DateTime invoiceEndDate, double invoiceFee, IDayCounter dayCounter);
+        public virtual Invoice AddInvoice(DateTime invoiceDate, DateTime invoiceStartDate, DateTime invoiceEndDate, double invoiceFee, IDayCounter dayCounter)
+        {
+            var invoice = new Invoice();
+            // Rate. Could probaply extract this some more.
+            var yearFraction = dayCounter.GetYearFraction(invoiceStartDate, invoiceEndDate);
+            var fractionRate = yearFraction * this.InterestRate / 100.0d;
+            invoice.Interest = Math.Round(this.GetInterest(fractionRate), 2, MidpointRounding.AwayFromZero);
 
-        public abstract Payment Pay(DateTime payDate, double paymentAmount);
+            var leftForPrincipal = this.GetPrincipal(invoice.Interest);
+            invoice.Principal = (leftForPrincipal <= this.CurrentPrincipal) ? leftForPrincipal : this.CurrentPrincipal;
+            invoice.Principal = Math.Round(invoice.Principal, 2, MidpointRounding.AwayFromZero);
+            invoice.InvoiceDate = invoiceDate;
+            invoice.InvoiceFee = invoiceFee;
+            return invoice;
+        }
+
+        protected abstract double GetInterest(double fractionRate);
+        protected abstract double GetPrincipal(double interest);
+
+        public virtual Payment Pay(DateTime payDate, double paymentAmount)
+        {
+            Payment aggregatedPayment = new Payment();
+            aggregatedPayment.PayDate = payDate;
+            foreach (var invoice in this.Invoices.OrderBy(o => o.InvoiceDate))
+            {
+                var payment = invoice.Pay(payDate, paymentAmount);
+                paymentAmount = payment.Reminder;
+                aggregatedPayment += payment;
+            }
+            aggregatedPayment.Reminder = paymentAmount;
+
+            // TODO: Here we can add things like overpayments.
+            return aggregatedPayment;
+        }
     }
 
     public class FixedEmiLoan : Loan
@@ -39,39 +70,19 @@ namespace LoanLib
             var dividend = Math.Pow(1 + r, n);
             var divisor = dividend - 1;
             this._emi = this.StartAmount * r * (dividend / divisor);
-        }
-        public override Invoice AddInvoice(DateTime invoiceDate, DateTime invoiceStartDate, DateTime invoiceEndDate, double invoiceFee, IDayCounter dayCounter)
-        {
-            var invoice = new Invoice();
-            // Rate. Could probaply extract this some more.
-            var yearFraction = dayCounter.GetYearFraction(invoiceStartDate, invoiceEndDate);
-            var fractionRate = yearFraction * this.InterestRate / 100.0d;
-            invoice.Interest = fractionRate * this.CurrentPrincipal;
-
-            var leftForPrincipal = this.Emi - invoice.Interest;
-            invoice.Principal = (leftForPrincipal <= this.CurrentPrincipal) ? leftForPrincipal : this.CurrentPrincipal;
-            invoice.InvoiceDate = invoiceDate;
-            invoice.InvoiceFee = invoiceFee;
-            return invoice;
+            this._emi = Math.Round(this._emi, 2, MidpointRounding.AwayFromZero);
         }
 
-        public override Payment Pay(DateTime payDate, double paymentAmount)
+        protected override double GetInterest(double fractionRate)
         {
-            Payment aggregatedPayment = new Payment();
-            aggregatedPayment.PayDate = payDate;
-            foreach (var invoice in this.Invoices.OrderBy(o => o.InvoiceDate))
-            {
-                var payment = invoice.Pay(payDate, paymentAmount);
-                paymentAmount = payment.Reminder;
-                aggregatedPayment += payment;
-            }
-            aggregatedPayment.Reminder = paymentAmount;
-            
-            // TODO: Here we can add things like overpayments.
-            return aggregatedPayment;
+            return fractionRate * this.CurrentPrincipal;
+        }
+
+        protected override double GetPrincipal(double interest)
+        {
+            return this.Emi - interest;
         }
     }
-
 
     public class FixedAmortizationLoan: Loan
     {
@@ -91,36 +102,17 @@ namespace LoanLib
         private void SetMonthlyPrincipal()
         {
             this._monthlyPrincipal = this.StartAmount / (double)(TenureYears * 12);
-        }
-        public override Invoice AddInvoice(DateTime invoiceDate, DateTime invoiceStartDate, DateTime invoiceEndDate, double invoiceFee, IDayCounter dayCounter)
-        {
-            var invoice = new Invoice();
-            // Rate. Could probaply extract this some more.
-            var yearFraction = dayCounter.GetYearFraction(invoiceStartDate, invoiceEndDate);
-            var fractionRate = yearFraction * this.InterestRate / 100.0d;
-            invoice.Interest = fractionRate * this.CurrentPrincipal;
-
-            var leftForPrincipal = this.MontlyPrincipal;
-            invoice.Principal = (leftForPrincipal <= this.CurrentPrincipal) ? leftForPrincipal : this.CurrentPrincipal;
-            invoice.InvoiceDate = invoiceDate;
-            invoice.InvoiceFee = invoiceFee;
-            return invoice;
+            this._monthlyPrincipal = Math.Round(this._monthlyPrincipal, 2, MidpointRounding.AwayFromZero);
         }
 
-        public override Payment Pay(DateTime payDate, double paymentAmount)
+        protected override double GetInterest(double fractionRate)
         {
-            Payment aggregatedPayment = new Payment();
-            aggregatedPayment.PayDate = payDate;
-            foreach (var invoice in this.Invoices.OrderBy(o => o.InvoiceDate))
-            {
-                var payment = invoice.Pay(payDate, paymentAmount);
-                paymentAmount = payment.Reminder;
-                aggregatedPayment += payment;
-            }
-            aggregatedPayment.Reminder = paymentAmount;
+            return fractionRate * this.CurrentPrincipal;
+        }
 
-            // TODO: Here we can add things like overpayments.
-            return aggregatedPayment;
+        protected override double GetPrincipal(double interest)
+        {
+            return this.MontlyPrincipal;
         }
     }
 
@@ -140,36 +132,17 @@ namespace LoanLib
         private void SetMonthlyPrincipal()
         {
             this._monthlyPrincipal = this.StartAmount / (double)(TenureYears * 12);
-        }
-        public override Invoice AddInvoice(DateTime invoiceDate, DateTime invoiceStartDate, DateTime invoiceEndDate, double invoiceFee, IDayCounter dayCounter)
-        {
-            var invoice = new Invoice();
-            // Rate. Could probaply extract this some more.
-            var yearFraction = dayCounter.GetYearFraction(invoiceStartDate, invoiceEndDate);
-            var fractionRate = yearFraction * this.InterestRate / 100.0d;
-            invoice.Interest = fractionRate * this.StartAmount;
-
-            var leftForPrincipal = this.MontlyPrincipal;
-            invoice.Principal = (leftForPrincipal <= this.CurrentPrincipal) ? leftForPrincipal : this.CurrentPrincipal;
-            invoice.InvoiceDate = invoiceDate;
-            invoice.InvoiceFee = invoiceFee;
-            return invoice;
+            this._monthlyPrincipal = Math.Round(this._monthlyPrincipal, 2, MidpointRounding.AwayFromZero);
         }
 
-        public override Payment Pay(DateTime payDate, double paymentAmount)
+        protected override double GetInterest(double fractionRate)
         {
-            Payment aggregatedPayment = new Payment();
-            aggregatedPayment.PayDate = payDate;
-            foreach (var invoice in this.Invoices.OrderBy(o => o.InvoiceDate))
-            {
-                var payment = invoice.Pay(payDate, paymentAmount);
-                paymentAmount = payment.Reminder;
-                aggregatedPayment += payment;
-            }
-            aggregatedPayment.Reminder = paymentAmount;
+            return fractionRate * this.StartAmount;
+        }
 
-            // TODO: Here we can add things like overpayments.
-            return aggregatedPayment;
+        protected override double GetPrincipal(double interest)
+        {
+            return this.MontlyPrincipal;
         }
     }
 }

@@ -60,9 +60,12 @@ namespace TestCoreWebApp.Controllers
 
         private List<LoanPayment> CreateLoanPaymentPlan(Loan loan, IDayCounter dayCalculator)
         {
+            // 4 year, 10 percentage, 16000 principal. Gives 0.05 left after 4 years. What is the worst outcome?
+            // 1 year, 10 percentage, 10000 principal. Gives a ton of rounding errors. Have to be fixed with rounding in both setting rate, principal, and total.
             var invoices = new List<LoanPayment>();
             var baseDate = loan.PayoutDate;
-            while (loan.CurrentPrincipal > 0.0)
+            Invoice tmp = null;
+            while (loan.CurrentPrincipal >= 0.01)
             {
                 baseDate = baseDate.AddMonths(1);
                 var date = baseDate.AddDays(-1);
@@ -71,19 +74,24 @@ namespace TestCoreWebApp.Controllers
                 invoices.Add(new LoanPayment
                 {
                     PeriodFormatted = invoice.InvoiceDate.ToString("yyyy-MM-dd"),
-                    Principal = (int)Math.Round(invoice.Principal, 0, MidpointRounding.AwayFromZero),
-                    Interest = (int)Math.Round(invoice.Interest, 0, MidpointRounding.AwayFromZero),
+                    Principal = invoice.Principal,
+                    Interest = invoice.Interest,
                 });
+                tmp = invoice;
             }
+            var q = invoices.Sum(s => s.Principal);
+            var w = invoices.Sum(s => s.Interest);
+            var e = tmp.Principal;
+            var f = tmp.Interest;
             return invoices;
         }
 
         public class LoanPayment
         {
             public string PeriodFormatted { get; set; }
-            public int Principal { get; set; }
-            public int Interest { get; set; }
-            public int Total { get { return Principal + Interest; } }
+            public double Principal { get; set; }
+            public double Interest { get; set; }
+            public double Total { get { return Math.Round(Principal + Interest, 2, MidpointRounding.AwayFromZero); } }
         }
     }
 }

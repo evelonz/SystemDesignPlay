@@ -10,18 +10,24 @@ import { FormControl } from '@angular/forms';
 })
 export class LoanFormComponent {
     private formdata: LoanFormData;
+    loantypes = [
+        { value: 'FixedEmiLoan', viewValue: 'Fixed EMI' },
+        { value: 'FixedAmortizationLoan', viewValue: 'Fixed Amortization' },
+        { value: 'FixedInterestLoan', viewValue: 'Fixed Interest' }
+    ];
 
     constructor(private loanService: LoanService) {
-        this.formdata = new LoanFormData(10, 1000, 10.0, new Date('2017-10-01'));
+        this.formdata = new LoanFormData('FixedEmiLoan', 10, 1000, 10.0, new Date('2017-10-01'));
     }
 
     onSubmit() {
-        this.loanService.updateLoanPaymentPlan(this.formdata.tenure, this.formdata.principal, this.formdata.interest, this.formdata.payoutDate);
+        this.loanService.updateLoanPaymentPlan(this.formdata.loantype, this.formdata.tenure, this.formdata.principal, this.formdata.interest, this.formdata.payoutDate);
     }
 }
 
 export class LoanFormData {
     constructor(
+        public loantype: string,
         public tenure: number,
         public principal: number,
         public interest: number,

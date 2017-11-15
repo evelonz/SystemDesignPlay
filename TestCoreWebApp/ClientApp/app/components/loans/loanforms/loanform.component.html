@@ -1,5 +1,13 @@
 
 <form class="example-form" (ngSubmit)="onSubmit()">
+    <mat-form-field>
+        <mat-select placeholder="Type of loan" [(ngModel)]="formdata.loantype" name="loantype">
+            <mat-option *ngFor="let loantype of loantypes" [value]="loantype.value">
+                {{ loantype.viewValue }}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+    <br />
     <mat-slider step="1" tickInterval="1" thumbLabel min="1" max="10" [(ngModel)]=formdata.tenure name="tenure">
         <input type="range">
     </mat-slider>
