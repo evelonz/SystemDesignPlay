@@ -14,7 +14,8 @@ namespace LoanLib.Tests
         [TestMethod()]
         public void AddInvoiceTest()
         {
-            var loan = new FixedEmiLoan()
+            var dayCalculator = new Thirty360Isda();
+            var loan = new FixedEmiLoan(dayCalculator)
             {
                 InterestRate = 10,
                 CurrentPrincipal = 10000,
@@ -24,14 +25,13 @@ namespace LoanLib.Tests
             };
 
             Invoice invoice = new Invoice();
-            var dayCalculator = new Thirty360Isda();
             var invoices = new List<Invoice>();
             var baseDate = loan.PayoutDate;
             while (loan.CurrentPrincipal >= 0.01)
             {
                 baseDate = baseDate.AddMonths(1);
                 var date = baseDate.AddDays(-1);
-                invoice = loan.AddInvoice(date, new DateTime(date.Year, date.Month, 1), baseDate, 0.0, dayCalculator);
+                invoice = loan.AddInvoice(date, new DateTime(date.Year, date.Month, 1), baseDate, 0.0);
                 loan.CurrentPrincipal -= invoice.Principal; // Fake payments on the loan.
                 invoices.Add(invoice);
             }

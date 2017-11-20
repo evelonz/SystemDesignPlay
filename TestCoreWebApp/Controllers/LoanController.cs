@@ -13,16 +13,16 @@ namespace TestCoreWebApp.Controllers
         [HttpGet("[action]")]
         public List<LoanPayment> LoanPayments(int tenure = 10)
         {
-            var loan = CreateLoan(Loantypes.FixedEmiLoan, tenure, 10, 10000, new DateTime(2017,10,01));
-            var res = CreateLoanPaymentPlan(loan, new Thirty360Isda());
+            var loan = CreateLoan(Loantypes.FixedEmiLoan, tenure, 10, 10000, new DateTime(2017,10,01), new Thirty360Isda());
+            var res = CreateLoanPaymentPlan(loan);
             return res;
         }
 
         [HttpGet("[action]")]
         public List<LoanPayment> Loan(Loantypes loanType, int tenure, double interestRate, int principal, DateTime payoutDate)
         {
-            var loan = CreateLoan(loanType, tenure, interestRate, principal, payoutDate);
-            var res = CreateLoanPaymentPlan(loan, new Thirty360Isda());
+            var loan = CreateLoan(loanType, tenure, interestRate, principal, payoutDate, new Thirty360Isda());
+            var res = CreateLoanPaymentPlan(loan);
             return res;
         }
 
@@ -33,19 +33,19 @@ namespace TestCoreWebApp.Controllers
             FixedInterestLoan = 3,
         }
 
-        private static Loan CreateLoan(Loantypes loanType, int tenure, double interestRate, int principal, DateTime payoutDate)
+        private static Loan CreateLoan(Loantypes loanType, int tenure, double interestRate, int principal, DateTime payoutDate, IDayCounter dayCalculator)
         {
             Loan loan;
             switch (loanType)
             {
                 case Loantypes.FixedEmiLoan:
-                    loan = new FixedEmiLoan();
+                    loan = new FixedEmiLoan(dayCalculator);
                     break;
                 case Loantypes.FixedAmortizationLoan:
-                    loan = new FixedAmortizationLoan();
+                    loan = new FixedAmortizationLoan(dayCalculator);
                     break;
                 case Loantypes.FixedInterestLoan:
-                    loan = new FixedInterestLoan();
+                    loan = new FixedInterestLoan(dayCalculator);
                     break;
                 default: throw new ArgumentException("Loan type not implemented");
             };
@@ -58,7 +58,7 @@ namespace TestCoreWebApp.Controllers
             return loan;
         }
 
-        private List<LoanPayment> CreateLoanPaymentPlan(Loan loan, IDayCounter dayCalculator)
+        private List<LoanPayment> CreateLoanPaymentPlan(Loan loan)
         {
             // 4 year, 10 percentage, 16000 principal. Gives 0.05 left after 4 years. What is the worst outcome?
             // 1 year, 10 percentage, 10000 principal. Gives a ton of rounding errors. Have to be fixed with rounding in both setting rate, principal, and total.
@@ -69,7 +69,7 @@ namespace TestCoreWebApp.Controllers
             {
                 baseDate = baseDate.AddMonths(1);
                 var date = baseDate.AddDays(-1);
-                var invoice = loan.AddInvoice(date, new DateTime(date.Year, date.Month, 1), baseDate, 0.0, dayCalculator);
+                var invoice = loan.AddInvoice(date, new DateTime(date.Year, date.Month, 1), baseDate, 0.0);
                 loan.CurrentPrincipal -= invoice.Principal;
                 invoices.Add(new LoanPayment
                 {
