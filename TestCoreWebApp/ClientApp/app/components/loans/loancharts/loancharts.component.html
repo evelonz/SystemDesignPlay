@@ -1,0 +1,13 @@
+<header class="widget-handle">
+    <h5>Widget Title</h5>
+    <div class="widget-controls">
+        <a title="Refresh">
+            <i *ngIf="showSpinner" class="fa fa-refresh fa-spin"></i>
+        </a>
+    </div>
+</header>
+
+<div class="widget-body">
+    <google-chart #your_chart [data]="chartData" *ngIf="!showSpinner">
+    </google-chart>
+</div>

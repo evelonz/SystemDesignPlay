@@ -14,6 +14,9 @@ import { MaterialLoanDataComponent } from './components/loans/loantable/material
 import { LoanService } from './components/loans/services/loan.service';
 import { LoanFormComponent } from './components/loans/loanforms/loanform.component';
 import { LoanCalculatorComponent } from './components/loans/loancalculator.component';
+import { LoanChartsComponent } from './components/loans/loancharts/loancharts.component';
+
+import { Ng2GoogleChartsModule } from 'ng2-google-charts';
 
 import {
     MatAutocompleteModule,
@@ -70,6 +73,7 @@ import { CdkTableModule         } from '@angular/cdk/table';
         LoanDataComponent,
         LoanFormComponent,
         LoanCalculatorComponent,
+        LoanChartsComponent,
         MaterialLoanDataComponent,
     ],
     imports: [
@@ -84,6 +88,7 @@ import { CdkTableModule         } from '@angular/cdk/table';
             { path: 'loan-calculator', component: LoanCalculatorComponent },
             { path: '**', redirectTo: 'home' }
         ]),
+        Ng2GoogleChartsModule,
         BrowserAnimationsModule,
         //NoopAnimationsModule,
         ReactiveFormsModule,
