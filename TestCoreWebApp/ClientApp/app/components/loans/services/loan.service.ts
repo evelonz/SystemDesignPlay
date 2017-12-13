@@ -15,7 +15,7 @@ export class LoanService {
         this.http = http;
     }
 
-    updateLoanPaymentPlan(loantype: string, tenure: number, principal: number, interest: number, payoutDate: Date) {
+    updateLoanPaymentPlan(loantype: string, tenure: number, principal: number, interest: number, payoutDate: Date, addSinglePayment: boolean) {
         let date = [
             payoutDate.getFullYear(),
             ('0' + (payoutDate.getMonth() + 1)).slice(-2),
@@ -26,7 +26,8 @@ export class LoanService {
             '&tenure=' + tenure +
             '&interestRate=' + interest +
             '&principal=' + principal +
-            '&payoutDate=' + date;
+            '&payoutDate=' + date +
+            '&addSinglePayment=' + addSinglePayment;
         this.http.get(queryString).subscribe(result => {
             //console.error(result.json());
             var p = result.json() as LoanPayment[];

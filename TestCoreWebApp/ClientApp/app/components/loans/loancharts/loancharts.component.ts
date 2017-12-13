@@ -24,7 +24,7 @@ export class LoanChartsComponent implements OnInit {
     showSpinner: boolean;
 
     public chartData = {
-        chartType: 'AreaChart', // your type
+        chartType: 'ColumnChart', // your type
         dataTable: [
             ['Date', 'Principal', 'Interest'],
             ['2017-10-31', 79.59, 8.33],
@@ -50,7 +50,7 @@ export class LoanChartsComponent implements OnInit {
         if (this.loanpayments.length > 1) {
             this.showSpinner = false;
             this.chartData = {
-                chartType: 'AreaChart',
+                chartType: 'ColumnChart',
                 dataTable: data,
                 options: {
                     'title': 'Tasks',

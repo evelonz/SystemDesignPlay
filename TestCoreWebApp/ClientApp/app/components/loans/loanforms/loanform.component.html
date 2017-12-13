@@ -35,6 +35,8 @@
         <mat-datepicker #picker></mat-datepicker>
     </mat-form-field>
     <br />
+    <mat-checkbox [(ngModel)]=formdata.addSinglePayment name="addSinglePayment">Check me!</mat-checkbox>
+    <br />
     <button mat-button type="submit">Calculate loan</button>
 </form>
 

@@ -17,11 +17,12 @@ export class LoanFormComponent {
     ];
 
     constructor(private loanService: LoanService) {
-        this.formdata = new LoanFormData('FixedEmiLoan', 10, 1000, 10.0, new Date('2017-10-01'));
+        this.formdata = new LoanFormData('FixedEmiLoan', 10, 1000, 10.0, new Date('2017-10-01'), false);
     }
 
     onSubmit() {
-        this.loanService.updateLoanPaymentPlan(this.formdata.loantype, this.formdata.tenure, this.formdata.principal, this.formdata.interest, this.formdata.payoutDate);
+        this.loanService.updateLoanPaymentPlan(this.formdata.loantype, this.formdata.tenure, this.formdata.principal,
+            this.formdata.interest, this.formdata.payoutDate, this.formdata.addSinglePayment);
     }
 }
 
@@ -31,6 +32,7 @@ export class LoanFormData {
         public tenure: number,
         public principal: number,
         public interest: number,
-        public payoutDate: Date
+        public payoutDate: Date,
+        public addSinglePayment: boolean,
     ) { }
 }

@@ -128,7 +128,7 @@ namespace TestConsoleApp
 
             var invoices = new List<Invoice>();
             var baseDate = loan.PayoutDate;
-            while (loan.CurrentPrincipal > 0.0)
+            while (loan.CurrentPrincipal > 0.001)
             {
                 baseDate = baseDate.AddMonths(1);
                 var date = baseDate.AddDays(-1);
@@ -156,7 +156,7 @@ namespace TestConsoleApp
 
             var invoices = new List<Invoice>();
             var baseDate = loan.PayoutDate;
-            while (loan.CurrentPrincipal > 0.0)
+            while (loan.CurrentPrincipal > 0.001)
             {
                 baseDate = baseDate.AddMonths(1);
                 var date = baseDate.AddDays(-1);
@@ -184,7 +184,7 @@ namespace TestConsoleApp
 
             var invoices = new List<Invoice>();
             var baseDate = loan.PayoutDate;
-            while (loan.CurrentPrincipal > 0.0)
+            while (loan.CurrentPrincipal > 0.001)
             {
                 baseDate = baseDate.AddMonths(1);
                 var date = baseDate.AddDays(-1);

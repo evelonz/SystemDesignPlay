@@ -19,10 +19,10 @@ namespace TestCoreWebApp.Controllers
         }
 
         [HttpGet("[action]")]
-        public List<LoanPayment> Loan(Loantypes loanType, int tenure, double interestRate, int principal, DateTime payoutDate)
+        public List<LoanPayment> Loan(Loantypes loanType, int tenure, double interestRate, int principal, DateTime payoutDate, bool addSinglePayment)
         {
             var loan = CreateLoan(loanType, tenure, interestRate, principal, payoutDate, new Thirty360Isda());
-            var res = CreateLoanPaymentPlan(loan);
+            var res = CreateLoanPaymentPlan(loan, addSinglePayment);
             return res;
         }
 
@@ -58,7 +58,7 @@ namespace TestCoreWebApp.Controllers
             return loan;
         }
 
-        private List<LoanPayment> CreateLoanPaymentPlan(Loan loan)
+        private List<LoanPayment> CreateLoanPaymentPlan(Loan loan, bool addSinglePayment = false)
         {
             // 4 year, 10 percentage, 16000 principal. Gives 0.05 left after 4 years. What is the worst outcome?
             // 1 year, 10 percentage, 10000 principal. Gives a ton of rounding errors. Have to be fixed with rounding in both setting rate, principal, and total.
@@ -71,6 +71,13 @@ namespace TestCoreWebApp.Controllers
                 var date = baseDate.AddDays(-1);
                 var invoice = loan.AddInvoice(date, new DateTime(date.Year, date.Month, 1), baseDate, 0.0);
                 loan.CurrentPrincipal -= invoice.Principal;
+                if (addSinglePayment && invoices.Count() == 5)
+                {
+                    var p = invoice.Pay(invoice.InvoiceDate, invoice.Principal / 2);
+                    invoice.Principal -= p.Principal + p.Reminder;
+                    invoice.Interest -= p.Interest;
+                    invoice.LateFee -= p.LateFee;
+                }
                 invoices.Add(new LoanPayment
                 {
                     PeriodFormatted = invoice.InvoiceDate.ToString("yyyy-MM-dd"),
@@ -79,10 +86,12 @@ namespace TestCoreWebApp.Controllers
                 });
                 tmp = invoice;
             }
-            var q = invoices.Sum(s => s.Principal);
-            var w = invoices.Sum(s => s.Interest);
-            var e = tmp.Principal;
-            var f = tmp.Interest;
+            //var q = invoices.Sum(s => s.Principal);
+            //var w = invoices.Sum(s => s.Interest);
+            //var e = tmp.Principal;
+            //var f = tmp.Interest;
+            
+
             return invoices;
         }
 
